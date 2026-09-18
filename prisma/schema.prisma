@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  fullName           String   @map("full_name") @db.VarChar(150)
+  email              String   @unique @db.VarChar(255)
+  phone              String   @db.VarChar(10)
+  passwordHash       String   @map("password_hash") @db.VarChar(255)
+  roleId             Int      @map("role_id")
+  isActive           Boolean  @default(true) @map("is_active")
+  mustChangePassword Boolean  @default(false) @map("must_change_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@map("users")
+}
