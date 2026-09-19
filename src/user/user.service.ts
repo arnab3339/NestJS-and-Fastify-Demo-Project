@@ -5,7 +5,7 @@ import { Prisma } from '../generated/prisma/client.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { HashService } from '../hash/hash.service.js';
 import { SafeUser } from './type/safe-user.type.js';
-
+import { UpdateUserDto } from './dto/update-user.dto.js';
 @Injectable()
 export class UserService {
     constructor(
@@ -36,5 +36,19 @@ export class UserService {
 
     async getAllUsers(): Promise<SafeUser[]> {
         return this.userRepository.getAll();
+    }
+    async updateUser(id: number, payload: UpdateUserDto,):Promise<SafeUser>{
+        try{
+            return this.userRepository.update(id,payload);
+        }catch(error){
+            if(
+                error instanceof Prisma.PrismaClientKnownRequestError && error.code==='p2002'
+            ){
+                throw new ConflictException(
+                    'A record with this value already exists',
+                );
+            }
+            throw error;
+        }
     }
 }

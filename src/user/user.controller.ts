@@ -2,6 +2,8 @@ import {
     Body,
     Controller,
     Get,
+    Param,
+    Patch,
     Post,
     UseGuards,
 } from '@nestjs/common';
@@ -15,6 +17,8 @@ import {
 import { JwtAuthGuard } from '../utils/guards/jwt-auth/jwt-auth.guard.js';
 import { RoleGuard } from '../utils/guards/role/role.guard.js';
 import { Roles } from '../utils/decorators/roles/roles.decorator.js';
+import { updateUserSchema } from './dto/update-user.dto.js';
+import type { UpdateUserDto } from './dto/update-user.dto.js';
 
 @Controller('users')
 export class UserController {
@@ -35,4 +39,14 @@ export class UserController {
     getAllUsersHandler() {
         return this.userService.getAllUsers();
     }
+    @Patch(':id')
+    @UseGuards(JwtAuthGuard,RoleGuard)
+    @Roles(['ADMIN'])
+    updateUserHandler(
+        @Param('id') id: string,
+        @Body({schema: updateUserSchema}) payload: UpdateUserDto,
+    ){
+        return this.userService.updateUser(Number(id), payload);
+    }
+   
 }

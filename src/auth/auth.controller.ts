@@ -1,16 +1,20 @@
 import {
     Body,
     Controller,
+    Get,
     HttpCode,
     HttpStatus,
     Post,
+    Req,
     Res,
+    UseGuards
 } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
-
+import { JwtAuthGuard } from '../utils/guards/jwt-auth/jwt-auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { LoginDto, loginSchema } from './dto/login.dto.js';
-
+import type { FastifyRequest } from 'fastify';
+import type { JwtPayload } from '../types/jwt-payload.type.js';
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
@@ -41,5 +45,12 @@ export class AuthController {
         return {
             message: 'Login successful',
         };
+    }
+    @Get('me')
+    @UseGuards(JwtAuthGuard)
+    meHandler(
+        @Req() request: FastifyRequest & {user: JwtPayload},
+    ){
+        return this.authService.getMe(request.user.sub);
     }
 }

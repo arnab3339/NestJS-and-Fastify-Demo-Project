@@ -35,4 +35,7 @@ export class AuthService {
             role: user.role.name,
         });
     }
+    async getMe(userId: number){
+        return this.userRepository.findById(userId);
+    }
 }

@@ -4,6 +4,7 @@ import { DatabaseService } from '../database/database.service.js';
 import { SafeUser } from './type/safe-user.type.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UserWithRole } from './type/user-with-role.type.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 
 @Injectable()
 export class UserRepository {
@@ -43,6 +44,27 @@ export class UserRepository {
             },
             include: {
                 role: true,
+            },
+        });
+    }
+    async findById(id: number): Promise<SafeUser|null>{
+        return this.prisma.user.findUnique({
+            where:{
+                id,
+            },
+            omit:{
+                passwordHash:true,
+            },
+        });
+    }
+    async update(id: number, data: UpdateUserDto,): Promise<SafeUser>{
+        return this.prisma.user.update({
+            where:{
+                id,
+            },
+            data,
+            omit:{
+                passwordHash:true,
             },
         });
     }
