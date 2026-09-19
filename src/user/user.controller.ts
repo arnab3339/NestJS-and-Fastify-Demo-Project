@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Param,
     Patch,
@@ -47,6 +48,14 @@ export class UserController {
         @Body({schema: updateUserSchema}) payload: UpdateUserDto,
     ){
         return this.userService.updateUser(Number(id), payload);
+    }
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    @Roles(['ADMIN'])
+    deleteUserHandler(
+        @Param('id') id: string,
+    ) {
+        return this.userService.deleteUser(Number(id));
     }
    
 }
